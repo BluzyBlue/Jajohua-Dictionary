@@ -5,58 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jajohua Dictionary</title>
     <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; background-color: #f4f4f9; }
-        h1 { color: #333; }
-        #searchBar { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .entry { background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 4px; }
-        .word { font-weight: bold; font-size: 1.3em; color: #0066cc; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #333; line-height: 1.4; }
+        header { border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+        h1 { margin: 0; font-size: 1.8em; }
+        #searchBar { width: 100%; padding: 10px; font-size: 1.1em; border: 2px solid #333; box-sizing: border-box; margin-bottom: 20px; }
+        
+        /* The Dictionary Grid */
+       #results { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+    
+    .entry { border: 1px solid #ddd; background: #fff; border-radius: 4px; }
+    
+    /* The clickable summary */
+    summary { padding: 15px; cursor: pointer; list-style: none; font-weight: bold; }
+    summary::-webkit-details-marker { display: none; } /* Hides default triangle */
+    
+    .word { font-size: 1.2em; color: #0066cc; }
+    .pos { color: #777; font-size: 0.8em; margin-left: 5px; }
+    
+    /* The hidden content that expands */
+    .details-content { padding: 15px; border-top: 1px solid #eee; background: #fafafa; font-size: 0.9em; }
+</style>
     </style>
 </head>
 <body>
 
-    <h1>Jajohua Dictionary</h1>
-    <input type="text" id="searchBar" placeholder="Search for a word..." onkeyup="search()">
-    <div id="dictionary-container">Loading dictionary...</div>
+    <header>
+        <h1>Jajohua Dictionary</h1>
+    </header>
+
+    <input type="text" id="searchBar" placeholder="Search..." onkeyup="searchDict()" autofocus>
+    <div id="results"></div>
 
     <script>
         let dictionary = [];
-
-        // Correctly pointing to words.json
         fetch('words.json')
-            .then(response => {
-                if (!response.ok) throw new Error("Could not find words.json");
-                return response.json();
-            })
-            .then(data => {
-                dictionary = data;
-                render(dictionary);
-            })
-            .catch(err => {
-                document.getElementById('dictionary-container').innerHTML = "Error loading words.json. Make sure the file is in the same folder as index.html.";
-                console.error(err);
-            });
+            .then(res => res.json())
+            .then(data => { dictionary = data; render(dictionary); });
 
         function render(data) {
-            const container = document.getElementById('dictionary-container');
-            if (data.length === 0) {
-                container.innerHTML = "No words found.";
-                return;
-            }
-            container.innerHTML = data.map(item => `
-                <div class="entry">
-                    <div class="word">${item.word}</div>
-                    <div><strong>Translation:</strong> ${item.translation}</div>
-                </div>
-            `).join('');
-        }
+        document.getElementById('results').innerHTML = data.map(item => `
+            <div class="entry">
+                <details>
+                    <summary>
+                        <span class="word">${item.word}</span>
+                        <span class="pos">${item.partOfSpeech}</span>
+                        <div style="font-weight: normal; margin-top:5px;">${item.translation}</div>
+                    </summary>
+                    <div class="details-content">
+                        <p><strong>IPA:</strong> /${item.ipaPronunciation}/</p>
+                        <p><strong>Example:</strong> ${item.exampleSentence || 'N/A'}</p>
+                        <p><strong>Root:</strong> ${item.rootWord || 'None'}</p>
+                        <p><strong>Borrowed from:</strong> ${item.borrowedFrom || 'N/A'}</p>
+                    </div>
+                </details>
+            </div>
+        `).join('');
+    }
+</script>
 
-        function search() {
+        function searchDict() {
             const query = document.getElementById('searchBar').value.toLowerCase();
-            const filtered = dictionary.filter(item => 
-                item.word.toLowerCase().includes(query) || 
-                item.translation.toLowerCase().includes(query)
-            );
-            render(filtered);
+            render(dictionary.filter(i => i.word.toLowerCase().includes(query) || i.translation.toLowerCase().includes(query)));
         }
     </script>
 </body>
