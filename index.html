@@ -31,11 +31,25 @@
         fetch('words.json').then(res => res.json()).then(data => { dictionary = data; render(dictionary); });
 
         function render(data) {
-            document.getElementById('results').innerHTML = data.map(item => {
-                const extraFields = Object.keys(item)
-                    .filter(k => !['word', 'translation', 'partOfSpeech', 'lessonId', 'masteryLevel'].includes(k) && item[k])
-                    .map(k => `<p><strong>${k.charAt(0).toUpperCase() + k.slice(1)}:</strong> ${item[k]}</p>`).join('');
-                return `<div class="entry"><details><summary>${item.word} <span style="font-size:0.8em; opacity:0.7">${item.partOfSpeech}</span><br>${item.translation}</summary><div class="details-content">${extraFields}</div></details></div>`;
+            const container = document.getElementById('results');
+            container.innerHTML = data.map(item => {
+                // Filter out unwanted fields and empty strings
+                const fields = Object.keys(item)
+                    .filter(k => !['word', 'translation', 'partOfSpeech', 'lessonId', 'masteryLevel'].includes(k))
+                    .filter(k => item[k] && item[k] !== "")
+                    .map(k => `<p><strong>${k}:</strong> ${item[k]}</p>`).join('');
+
+                return `
+                    <div class="entry">
+                        <details>
+                            <summary>
+                                <span class="word">${item.word}</span>
+                                <span class="pos">${item.partOfSpeech || ''}</span><br>
+                                <span>${item.translation || ''}</span>
+                            </summary>
+                            <div class="details-content">${fields}</div>
+                        </details>
+                    </div>`;
             }).join('');
         }
 
@@ -63,6 +77,3 @@
     </script>
 </body>
 </html>
-
-
-
