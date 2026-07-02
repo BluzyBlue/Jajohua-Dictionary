@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jajohua Dictionary</title>
-   <head>
-    ...
     <link rel="stylesheet" href="style.css">
-</head>
 </head>
 <body>
 
@@ -22,6 +19,10 @@
             <option value="endsWith">Ends With</option>
         </select>
         <input type="text" id="searchBar" placeholder="Search..." onkeyup="searchDict()" autofocus>
+        <select id="themeSelector" onchange="changeTheme()">
+            <option value="light">Light Theme</option>
+            <option value="dark">Dark Theme</option>
+        </select>
     </div>
 
     <div id="results"></div>
@@ -38,7 +39,6 @@
             document.getElementById('results').innerHTML = data.map(item => {
                 const extraFields = Object.keys(item)
                     .filter(key => !['word', 'translation', 'partOfSpeech', 'lessonId', 'masteryLevel'].includes(key))
-                    // Only show field if it exists and is not an empty string
                     .filter(key => item[key] !== "" && item[key] !== null)
                     .map(key => `<p><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${item[key]}</p>`)
                     .join('');
@@ -58,6 +58,25 @@
             }).join('');
         }
 
+        function changeTheme() {
+            const theme = document.getElementById('themeSelector').value;
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        window.onload = () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('themeSelector').value = 'dark';
+            }
+        };
+
         function searchDict() {
             const query = document.getElementById('searchBar').value.toLowerCase();
             const mode = document.getElementById('searchMode').value;
@@ -66,7 +85,7 @@
                 const target = i.word.toLowerCase();
                 if (mode === "startsWith") return target.startsWith(query);
                 if (mode === "endsWith") return target.endsWith(query);
-                return target.includes(query); // Default: contains
+                return target.includes(query);
             }));
         }
     </script>
