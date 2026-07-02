@@ -33,11 +33,11 @@
     <button onclick="randomWord()">Random</button>
 
     <select id="themeSelector" onchange="changeTheme()">
-        <option value="light">Light Theme</option>
-        <option value="dark">Dark Theme</option>
-        <option value="high-contrast">High Contrast</option>
-        <option value="pop-neon">Pop Neon</option>
-    </select>
+    <option value="light">Light Theme</option>
+    <option value="dark">Dark Theme</option>
+    <option value="high-contrast">High Contrast</option>
+    <option value="pop-neon">Pop Neon</option>
+</select>
 
 </div>
 
@@ -196,7 +196,31 @@ for (let j = 1; j <= b.length; j++) {
                 );
     }
 }
+function changeTheme() {
+    const theme = document.getElementById("themeSelector").value;
 
+    // remove old theme classes
+    document.body.classList.remove("dark", "high-contrast", "pop-neon");
+
+    // apply new theme (except light)
+    if (theme !== "light") {
+        document.body.classList.add(theme);
+    }
+
+    localStorage.setItem("theme", theme);
+}
+
+window.onload = () => {
+    const saved = localStorage.getItem("theme") || "light";
+
+    document.body.classList.remove("dark", "high-contrast", "pop-neon");
+
+    if (saved !== "light") {
+        document.body.classList.add(saved);
+    }
+
+    document.getElementById("themeSelector").value = saved;
+};
 return matrix[b.length][a.length];
 
 }
