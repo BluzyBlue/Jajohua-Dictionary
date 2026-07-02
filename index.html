@@ -7,13 +7,12 @@
 <title>Jajohua Dictionary</title>
 
 <link rel="stylesheet" href="style.css">
-
 </head>
+
 <body>
 
 <header>
-    <h1>📖 Jajohua Dictionary</h1>
-    <p>Search the official language dictionary.</p>
+    <h1>Jajohua Dictionary</h1>
 </header>
 
 <div class="toolbar">
@@ -24,130 +23,195 @@
         <option value="endsWith">Ends With</option>
     </select>
 
-    <input
-        id="searchBar"
-        type="text"
-        placeholder="Search Jajohua..."
-        onkeyup="searchDict()"
-        autofocus>
+    <input id="searchBar" type="text" placeholder="Search..." onkeyup="searchDict()">
 
-    <select id="themeSelector" onchange="changeTheme()">
-        <option value="light">☀ Light</option>
-        <option value="dark">🌙 Dark</option>
-        <option value="contrast">⚫ High Contrast</option>
-        <option value="neon">🌈 Neon</option>
+    <button onclick="toggleFuzzy()" id="fuzzyBtn">Fuzzy: Off</button>
+
+    <select id="posFilter" onchange="searchDict()">
+        <option value="">All Parts of Speech</option>
     </select>
 
+    <button onclick="randomWord()">Random</button>
+
 </div>
+
+<div class="alphabet" id="alphabet"></div>
 
 <div id="results"></div>
 
 <script>
 
-let dictionary=[];
+let dictionary = [];
+let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+let fuzzy = false;
 
 fetch("words.json")
-.then(r=>r.json())
-.then(data=>{
-    dictionary=data;
+.then(r => r.json())
+.then(data => {
+    dictionary = data;
+    buildPOSFilter();
+    buildAlphabet();
     render(dictionary);
 });
 
-function render(data){
+function buildPOSFilter() {
+    const set = new Set(dictionary.map(d => d.partOfSpeech).filter(Boolean));
+    const sel = document.getElementById("posFilter");
 
-const results=document.getElementById("results");
-
-results.innerHTML=data.map(item=>{
-
-const fields=Object.keys(item)
-.filter(k=>!["word","translation","partOfSpeech","lessonId","masteryLevel"].includes(k))
-.filter(k=>item[k]!="")
-.map(k=>`
-<div class="field">
-<div class="label">${k}</div>
-<div>${item[k]}</div>
-</div>
-`).join("");
-
-return`
-
-<div class="entry">
-
-<details>
-
-<summary>
-
-<div class="word">${item.word}</div>
-
-<div class="translation">${item.translation || ""}</div>
-
-<div class="pos">${item.partOfSpeech || ""}</div>
-
-</summary>
-
-<div class="details">
-
-${fields}
-
-</div>
-
-</details>
-
-</div>
-
-`;
-
-}).join("");
-
+    set.forEach(pos => {
+        const opt = document.createElement("option");
+        opt.value = pos;
+        opt.textContent = pos;
+        sel.appendChild(opt);
+    });
 }
 
-function searchDict(){
+function buildAlphabet() {
+    const alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    const container = document.getElementById("alphabet");
 
-const query=document.getElementById("searchBar").value.toLowerCase();
-
-const mode=document.getElementById("searchMode").value;
-
-render(dictionary.filter(i=>{
-
-const word=(i.word||"").toLowerCase();
-
-const trans=(i.translation||"").toLowerCase();
-
-if(mode==="startsWith")
-return word.startsWith(query);
-
-if(mode==="endsWith")
-return word.endsWith(query);
-
-return word.includes(query)||trans.includes(query);
-
-}));
-
+    container.innerHTML = alpha.map(a =>
+        `<button onclick="jumpTo('${a}')">${a}</button>`
+    ).join("");
 }
 
-function changeTheme(){
+function render(data) {
+    const container = document.getElementById("results");
 
-const theme=document.getElementById("themeSelector").value;
+    container.innerHTML = data.map(item => {
 
-document.body.className=theme;
+        const id = item.word;
 
-localStorage.setItem("theme",theme);
+        const fields = Object.keys(item)
+            .filter(k => !["word","translation","partOfSpeech","lessonId","masteryLevel"].includes(k))
+            .filter(k => item[k])
+            .map(k => `
+                <div class="field">
+                    <div class="label">${k}</div>
+                    <div>${item[k]}</div>
+                </div>
+            `).join("");
 
+        const isFav = favorites.includes(id);
+
+        return `
+        <div class="entry" data-word="${item.word.toLowerCase()}">
+
+            <div class="card" onclick="toggleCard(this)">
+                
+                <div class="top">
+                    <div>
+                        <div class="word">${item.word}</div>
+                        <div class="translation">${item.translation || ""}</div>
+                        <div class="pos">${item.partOfSpeech || ""}</div>
+                    </div>
+
+                    <button class="star ${isFav ? 'active' : ''}"
+                        onclick="event.stopPropagation(); toggleFav('${id}')">
+                        ★
+                    </button>
+                </div>
+
+                <div class="details">
+                    ${fields}
+                </div>
+
+            </div>
+
+        </div>`;
+    }).join("");
 }
 
-window.onload=()=>{
+function toggleCard(el) {
+    el.classList.toggle("open");
+}
 
-const saved=localStorage.getItem("theme") || "light";
+function searchDict() {
+    const query = document.getElementById("searchBar").value.toLowerCase();
+    const mode = document.getElementById("searchMode").value;
+    const pos = document.getElementById("posFilter").value;
 
-document.body.className=saved;
+    let results = dictionary;
 
-document.getElementById("themeSelector").value=saved;
+    if (pos) {
+        results = results.filter(i => i.partOfSpeech === pos);
+    }
 
-};
+    results = results.filter(i => {
+
+        const word = (i.word || "").toLowerCase();
+        const trans = (i.translation || "").toLowerCase();
+
+        let match = false;
+
+        if (mode === "startsWith") match = word.startsWith(query);
+        else if (mode === "endsWith") match = word.endsWith(query);
+        else match = word.includes(query) || trans.includes(query);
+
+        if (!match && fuzzy && query.length > 1) {
+            return levenshtein(word, query) <= 2;
+        }
+
+        return match;
+    });
+
+    render(results);
+}
+
+function toggleFuzzy() {
+    fuzzy = !fuzzy;
+    document.getElementById("fuzzyBtn").textContent =
+        "Fuzzy: " + (fuzzy ? "On" : "Off");
+    searchDict();
+}
+
+function randomWord() {
+    const item = dictionary[Math.floor(Math.random() * dictionary.length)];
+    document.getElementById("searchBar").value = item.word;
+    searchDict();
+}
+
+function toggleFav(word) {
+    if (favorites.includes(word)) {
+        favorites = favorites.filter(w => w !== word);
+    } else {
+        favorites.push(word);
+    }
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    render(dictionary);
+}
+
+function jumpTo(letter) {
+    const el = document.querySelector(`[data-word^="${letter.toLowerCase()}"]`);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/* simple fuzzy (Levenshtein) */
+function levenshtein(a, b) {
+    const matrix = Array.from({ length: b.length + 1 }, () =>
+        Array(a.length + 1).fill(0)
+    );
+
+    for (let i = 0; i <= a.length; i++) matrix[0][i] = i;
+    for (let j = 0; j <= b.length; j++) matrix[j][0] = j;
+
+    for (let j = 1; j <= b.length; j++) {
+        for (let i = 1; i <= a.length; i++) {
+            matrix[j][i] =
+                b[j - 1] === a[i - 1]
+                    ? matrix[j - 1][i - 1]
+                    : Math.min(
+                        matrix[j - 1][i - 1] + 1,
+                        matrix[j][i - 1] + 1,
+                        matrix[j - 1][i] + 1
+                    );
+        }
+    }
+
+    return matrix[b.length][a.length];
+}
 
 </script>
 
 </body>
 </html>
-
-
