@@ -34,34 +34,32 @@
         let dictionary = [];
         fetch('words.json')
             .then(res => res.json())
-            .then(data => { dictionary = data; render(dictionary); });
+            .then(data => { dictionary = data; render(dictionary); })
+            .catch(err => console.error("Error loading JSON:", err));
 
-      function render(data) {
-    document.getElementById('results').innerHTML = data.map(item => {
-        // 1. Get all keys from the current JSON object
-        // 2. Filter out keys we don't want (word, translation, partOfSpeech, and lessonId)
-        // 3. Create the HTML for the remaining fields automatically
-        const extraFields = Object.keys(item)
-            .filter(key => !['word', 'masteryLevel' 'lessonId'].includes(key))
-            .map(key => `<p><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${item[key]}</p>`)
-            .join('');
+        function render(data) {
+            document.getElementById('results').innerHTML = data.map(item => {
+                const extraFields = Object.keys(item)
+                    .filter(key => !['word', 'translation', 'partOfSpeech', 'lessonId', 'masteryLevel'].includes(key))
+                    .map(key => `<p><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${item[key]}</p>`)
+                    .join('');
 
-        return `
-            <div class="entry">
-                <details>
-                    <summary>
-                        <span class="word">${item.word}</span>
-                        <span class="pos">${item.partOfSpeech}</span>
-                        <div style="font-weight: normal; margin-top:5px;">${item.translation}</div>
-                    </summary>
-                    <div class="details-content">
-                        ${extraFields}
+                return `
+                    <div class="entry">
+                        <details>
+                            <summary>
+                                <span class="word">${item.word}</span>
+                                <span class="pos">${item.partOfSpeech}</span>
+                                <div style="font-weight: normal; margin-top:5px;">${item.translation}</div>
+                            </summary>
+                            <div class="details-content">
+                                ${extraFields}
+                            </div>
+                        </details>
                     </div>
-                </details>
-            </div>
-        `;
-    }).join('');
-}
+                `;
+            }).join('');
+        }
 
         function searchDict() {
             const query = document.getElementById('searchBar').value.toLowerCase();
@@ -70,8 +68,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-.
