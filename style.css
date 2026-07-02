@@ -5,23 +5,24 @@
 }
 
 /* Dark Mode */
-body.dark-mode {
-    --bg-color: #1a1a1a; --text-color: #e0e0e0; --card-bg: #2d2d2d;
-    --border-color: #444; --accent-color: #66b3ff;
-}
+body.dark-mode { --bg-color: #1a1a1a; --text-color: #e0e0e0; --card-bg: #2d2d2d; --border-color: #444; --accent-color: #66b3ff; }
 
 /* High Contrast */
-body.high-contrast {
-    --bg-color: #000; --text-color: #fff; --card-bg: #000;
-    --border-color: #fff; --accent-color: #ffff00;
-}
+body.high-contrast { --bg-color: #000; --text-color: #fff; --card-bg: #000; --border-color: #fff; --accent-color: #ffff00; }
 
 /* Pop Neon */
-body.pop-neon {
-    --bg-color: #0a0a0a; --text-color: #ff00ff; --card-bg: #1a1a1a;
-    --border-color: #00ffff; --accent-color: #00ffff;
+body.pop-neon { --bg-color: #0a0a0a; --text-color: #ff00ff; --card-bg: #1a1a1a; --border-color: #00ffff; --accent-color: #00ffff; }
+
+/* --- Crucial: Force the update by targeting the body class --- */
+body.dark-mode, body.high-contrast, body.pop-neon {
+    background-color: var(--bg-color);
+    color: var(--text-color);
 }
 
+/* Ensure inputs/cards update when the body class changes */
+body.dark-mode #searchMode, body.dark-mode #themeSelector, body.dark-mode #searchBar, body.dark-mode .entry,
+body.high-contrast #searchMode, body.high-contrast #themeSelector, body.high-contrast #searchBar, body.high-contrast .entry,
+body.pop-neon #searchMode, body.pop-neon #themeSelector, body.pop-neon #searchBar, body.pop-neon .entry {
 /* --- Base Layout --- */
 body { font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; color: var(--text-color); background-color: var(--bg-color); transition: 0.3s; }
 .search-container { display: flex; gap: 10px; margin-bottom: 20px; }
