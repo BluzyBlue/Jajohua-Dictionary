@@ -10,21 +10,15 @@
         h1 { margin: 0; font-size: 1.8em; }
         #searchBar { width: 100%; padding: 10px; font-size: 1.1em; border: 2px solid #333; box-sizing: border-box; margin-bottom: 20px; }
         
-        /* The Dictionary Grid */
-       #results { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
-    
-    .entry { border: 1px solid #ddd; background: #fff; border-radius: 4px; }
-    
-    /* The clickable summary */
-    summary { padding: 15px; cursor: pointer; list-style: none; font-weight: bold; }
-    summary::-webkit-details-marker { display: none; } /* Hides default triangle */
-    
-    .word { font-size: 1.2em; color: #0066cc; }
-    .pos { color: #777; font-size: 0.8em; margin-left: 5px; }
-    
-    /* The hidden content that expands */
-    .details-content { padding: 15px; border-top: 1px solid #eee; background: #fafafa; font-size: 0.9em; }
-</style>
+        #results { column-width: 280px; column-gap: 15px; }
+        .entry { display: inline-block; width: 100%; margin-bottom: 15px; break-inside: avoid; border: 1px solid #ddd; background: #fff; border-radius: 4px; }
+        
+        summary { padding: 15px; cursor: pointer; list-style: none; font-weight: bold; }
+        summary::-webkit-details-marker { display: none; }
+        
+        .word { font-size: 1.2em; color: #0066cc; }
+        .pos { color: #777; font-size: 0.8em; margin-left: 5px; }
+        .details-content { padding: 15px; border-top: 1px solid #eee; background: #fafafa; font-size: 0.9em; }
     </style>
 </head>
 <body>
@@ -43,25 +37,24 @@
             .then(data => { dictionary = data; render(dictionary); });
 
         function render(data) {
-        document.getElementById('results').innerHTML = data.map(item => `
-            <div class="entry">
-                <details>
-                    <summary>
-                        <span class="word">${item.word}</span>
-                        <span class="pos">${item.partOfSpeech}</span>
-                        <div style="font-weight: normal; margin-top:5px;">${item.translation}</div>
-                    </summary>
-                    <div class="details-content">
-                        <p><strong>IPA:</strong> /${item.ipaPronunciation}/</p>
-                        <p><strong>Example:</strong> ${item.exampleSentence || 'N/A'}</p>
-                        <p><strong>Root:</strong> ${item.rootWord || 'None'}</p>
-                        <p><strong>Borrowed from:</strong> ${item.borrowedFrom || 'N/A'}</p>
-                    </div>
-                </details>
-            </div>
-        `).join('');
-    }
-</script>
+            document.getElementById('results').innerHTML = data.map(item => `
+                <div class="entry">
+                    <details>
+                        <summary>
+                            <span class="word">${item.word}</span>
+                            <span class="pos">${item.partOfSpeech}</span>
+                            <div style="font-weight: normal; margin-top:5px;">${item.translation}</div>
+                        </summary>
+                        <div class="details-content">
+                            <p><strong>IPA:</strong> /${item.ipaPronunciation}/</p>
+                            <p><strong>Example:</strong> ${item.exampleSentence || 'N/A'}</p>
+                            <p><strong>Root:</strong> ${item.rootWord || 'None'}</p>
+                            <p><strong>Borrowed from:</strong> ${item.borrowedFrom || 'N/A'}</p>
+                        </div>
+                    </details>
+                </div>
+            `).join('');
+        }
 
         function searchDict() {
             const query = document.getElementById('searchBar').value.toLowerCase();
