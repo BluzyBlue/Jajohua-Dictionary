@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jajohua Dictionary</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; background: #f4f6f8; color: #333; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #bdbdbd; padding-bottom: 10px; }
+        input { width: 100%; padding: 12px; margin-bottom: 25px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        .entry { background: white; padding: 20px; margin-bottom: 15px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .word-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px; }
+        .word { font-size: 1.4em; font-weight: bold; color: #2980b9; }
+        .pos { font-style: italic; color: #7f8c8d; }
+        .ipa { color: #16a085; font-family: monospace; }
+        .translation { font-size: 1.1em; margin: 8px 0; }
+        .meta-info { font-size: 0.85em; color: #95a5a6; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 8px; }
+        .example { background: #fdfefe; border-left: 3px solid #3498db; padding: 8px 12px; margin-top: 10px; font-style: italic; }
+        .english-ex { font-style: normal; color: #555; font-size: 0.95em; }
+    </style>
+</head>
+<body>
+
+    <h1>Jajohua Online Dictionary</h1>
+    <input type="text" id="searchBar" placeholder="Search Jajohua words, translations, or origins..." onkeyup="searchDict()">
+    
+    <div id="results">Loading dictionary entries...</div>
+
+    <script>
+        // Global variable to hold data once fetched
+        let dictionary = [];
+
+        // 1. Fetch the JSON data from your repository files asynchronously
+        fetch('dictionary.json')
+            .then(response => response.json())
+            .then(data => {
+                dictionary = data;
+                displayWords(dictionary); // Show words once loaded
+            })
+            .catch(error => {
+                document.getElementById('results').innerHTML = '<p style="color: red;">Error loading dictionary data.</p>';
+                console.error("Error fetching JSON:", error);
+            });
+
+        // 2. Display logic
+        function displayWords(words) {
+            const container = document.getElementById('results');
+            container.innerHTML = '';
+            
+            if(words.length === 0) {
+                container.innerHTML = '<p style="color: #7f8c8d;">No words found matching that search.</p>';
+                return;
+            }
+
+            words.forEach(item => {
+                let exampleHTML = '';
+                if (item.exampleSentence) {
+                    exampleHTML = `
+                        <div class="example">
+                            <strong>Eg:</strong> ${item.exampleSentence} 
+                            ${item.exampleEnglish ? `<br><span class="english-ex">"${item.exampleEnglish}"</span>` : ''}
+                        </div>
+                    `;
+                }
+
+                let originHTML = '';
+                if (item.borrowedFrom) {
+                    originHTML = `<span>• Borrowed from: <strong>${item.borrowedFrom}</strong></span>`;
+                }
+
+                container.innerHTML += `
+                    <div class="entry">
+                        <div class="word-header">
+                            <span class="word">${item.word}</span>
+                            <span class="pos">(${item.partOfSpeech})</span>
+                            <span class="ipa">/[${item.ipaPronunciation}]/</span>
+                        </div>
+                        <div class="translation"><strong>${item.translation}</strong></div>
+                        ${exampleHTML}
+                        <div class="meta-info">
+                            <span>Syllables: ${item.syllableBreakdown || item.word}</span> 
+                            ${originHTML}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // 3. Live filter logic
+        function searchDict() {
+            const query = document.getElementById('searchBar').value.toLowerCase();
+            const filtered = dictionary.filter(item => 
+                item.word.toLowerCase().includes(query) || 
+                item.translation.toLowerCase().includes(query) ||
+                (item.borrowedFrom && item.borrowedFrom.toLowerCase().includes(query))
+            );
+            displayWords(filtered);
+        }
+    </script>
+</body>
+</html>
