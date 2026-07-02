@@ -9,8 +9,8 @@
         h1 { color: #2c3e50; border-bottom: 2px solid #bdbdbd; padding-bottom: 10px; }
         input { width: 100%; padding: 12px; margin-bottom: 25px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
         .entry { background: white; padding: 20px; margin-bottom: 15px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .word-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px; }
-        .word { font-size: 1.4em; font-weight: bold; color: #2980b9; }
+        .words-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px; }
+        .words { font-size: 1.4em; font-weight: bold; color: #2980b9; }
         .pos { font-style: italic; color: #7f8c8d; }
         .ipa { color: #16a085; font-family: monospace; }
         .translation { font-size: 1.1em; margin: 8px 0; }
@@ -22,7 +22,7 @@
 <body>
 
     <h1>Jajohua Online Dictionary</h1>
-    <input type="text" id="searchBar" placeholder="Search Jajohua words, translations, or origins..." onkeyup="searchDict()">
+    <input type="text" id="searchBar" placeholder="Search Jajohua wordss, translations, or origins..." onkeyup="searchDict()">
     
     <div id="results">Loading dictionary entries...</div>
 
@@ -35,7 +35,7 @@
             .then(response => response.json())
             .then(data => {
                 dictionary = data;
-                displayWords(dictionary); // Show words once loaded
+                displaywordss(dictionary); // Show wordss once loaded
             })
             .catch(error => {
                 document.getElementById('results').innerHTML = '<p style="color: red;">Error loading dictionary data.</p>';
@@ -43,16 +43,16 @@
             });
 
         // 2. Display logic
-        function displayWords(words) {
+        function displaywordss(wordss) {
             const container = document.getElementById('results');
             container.innerHTML = '';
             
-            if(words.length === 0) {
-                container.innerHTML = '<p style="color: #7f8c8d;">No words found matching that search.</p>';
+            if(wordss.length === 0) {
+                container.innerHTML = '<p style="color: #7f8c8d;">No wordss found matching that search.</p>';
                 return;
             }
 
-            words.forEach(item => {
+            wordss.forEach(item => {
                 let exampleHTML = '';
                 if (item.exampleSentence) {
                     exampleHTML = `
@@ -70,15 +70,15 @@
 
                 container.innerHTML += `
                     <div class="entry">
-                        <div class="word-header">
-                            <span class="word">${item.word}</span>
+                        <div class="words-header">
+                            <span class="words">${item.words}</span>
                             <span class="pos">(${item.partOfSpeech})</span>
                             <span class="ipa">/[${item.ipaPronunciation}]/</span>
                         </div>
                         <div class="translation"><strong>${item.translation}</strong></div>
                         ${exampleHTML}
                         <div class="meta-info">
-                            <span>Syllables: ${item.syllableBreakdown || item.word}</span> 
+                            <span>Syllables: ${item.syllableBreakdown || item.words}</span> 
                             ${originHTML}
                         </div>
                     </div>
@@ -90,11 +90,11 @@
         function searchDict() {
             const query = document.getElementById('searchBar').value.toLowerCase();
             const filtered = dictionary.filter(item => 
-                item.word.toLowerCase().includes(query) || 
+                item.words.toLowerCase().includes(query) || 
                 item.translation.toLowerCase().includes(query) ||
                 (item.borrowedFrom && item.borrowedFrom.toLowerCase().includes(query))
             );
-            displayWords(filtered);
+            displaywordss(filtered);
         }
     </script>
 </body>
