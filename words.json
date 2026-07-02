@@ -40,5 +40,18 @@
     "masteryLevel": 0,
     "lessonId": "1",
     "borrowedFrom": "Chinese"
-  }
+  },
+  {
+    "word": "fi",
+    "translation": "them (singular)",
+    "partOfSpeech": "",
+    "ipaPronunciation": "",
+    "simplePronunciation": "",
+    "exampleSentence": "",
+    "exampleEnglish": "",
+    "syllableBreakdown": "",
+    "rootWord": "",
+    "masteryLevel": 0,
+    "lessonId": "1"
+  } 
 ]
