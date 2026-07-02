@@ -1,82 +1,121 @@
+/* =========================
+   THEME VARIABLES (ORIGINAL IDEA, FIXED)
+========================= */
+
 :root {
-    --bg: #f5f7fb;
-    --card: #ffffff;
-    --text: #222;
-    --border: #d0d0d0;
-    --accent: #2b6cb0;
+    --bg-color: #f4f4f9;
+    --text-color: #333;
+    --card-bg: #fff;
+    --border-color: #ddd;
+    --accent-color: #0066cc;
 }
 
+/* DARK THEME */
+body.dark {
+    --bg-color: #1a1a1a;
+    --text-color: #e0e0e0;
+    --card-bg: #2d2d2d;
+    --border-color: #444;
+    --accent-color: #66b3ff;
+}
+
+/* HIGH CONTRAST */
+body.high-contrast {
+    --bg-color: #000;
+    --text-color: #fff;
+    --card-bg: #000;
+    --border-color: #fff;
+    --accent-color: #ffff00;
+}
+
+/* POP NEON */
+body.pop-neon {
+    --bg-color: #0a0a0a;
+    --text-color: #ff00ff;
+    --card-bg: #1a1a1a;
+    --border-color: #00ffff;
+    --accent-color: #00ffff;
+}
+
+/* =========================
+   BASE LAYOUT
+========================= */
+
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+
+    background: var(--bg-color);
+    color: var(--text-color);
+
+    transition: 0.25s ease;
 }
 
 /* HEADER */
 header {
     text-align: center;
-    padding: 25px;
-    font-size: 22px;
+    margin-bottom: 20px;
 }
 
-/* TOOLBAR */
-.toolbar {
+/* =========================
+   SEARCH BAR
+========================= */
+
+.search-container {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-    padding: 10px;
-    position: sticky;
-    top: 0;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
 }
 
-input, select, button {
+#searchMode,
+#themeSelector,
+#searchBar,
+button {
     padding: 10px;
-    border: 1px solid var(--border);
+    border: 2px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-color);
     border-radius: 6px;
-    background: var(--card);
+    font-size: 14px;
 }
 
-/* ALPHABET BAR */
-.alphabet {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 5px;
-    padding: 10px;
+#searchBar {
+    flex: 1;
+    min-width: 200px;
 }
 
-.alphabet button {
-    width: 32px;
-    height: 32px;
-    cursor: pointer;
-}
+/* =========================
+   MASONRY GRID (IMPORTANT FIX)
+========================= */
 
-/* GRID (MASONRY STYLE) */
 #results {
-    columns: 320px;
+    column-width: 280px;
     column-gap: 15px;
-    padding: 15px;
 }
 
-/* CARD */
+/* Each card wrapper */
 .entry {
     display: inline-block;
     width: 100%;
     margin-bottom: 15px;
+    break-inside: avoid;
 }
 
+/* =========================
+   CARD
+========================= */
+
 .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
     padding: 15px;
     cursor: pointer;
-    break-inside: avoid;
-    transition: 0.2s;
+
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .card:hover {
@@ -84,17 +123,17 @@ input, select, button {
 }
 
 /* TOP ROW */
-.top {
+.card-top {
     display: flex;
     justify-content: space-between;
-    align-items: start;
+    align-items: flex-start;
 }
 
 /* WORD */
 .word {
-    font-size: 18px;
+    font-size: 1.3rem;
     font-weight: bold;
-    color: var(--accent);
+    color: var(--accent-color);
 }
 
 /* TRANSLATION */
@@ -104,16 +143,19 @@ input, select, button {
 
 /* PART OF SPEECH */
 .pos {
+    margin-top: 6px;
     display: inline-block;
-    margin-top: 8px;
     padding: 3px 8px;
-    border-radius: 20px;
-    background: var(--accent);
-    color: white;
+    border-radius: 12px;
+    background: var(--accent-color);
+    color: #fff;
     font-size: 12px;
 }
 
-/* STAR */
+/* =========================
+   FAVORITE STAR
+========================= */
+
 .star {
     border: none;
     background: none;
@@ -126,27 +168,56 @@ input, select, button {
     opacity: 1;
 }
 
-/* DETAILS */
+/* =========================
+   EXPANDABLE DETAILS (FIXED)
+========================= */
+
 .details {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease;
-    margin-top: 10px;
-    border-top: 1px solid var(--border);
+
+    transition: max-height 0.3s ease, margin-top 0.3s ease;
+    margin-top: 0;
+
+    border-top: 1px solid var(--border-color);
     padding-top: 0;
 }
 
 .card.open .details {
-    max-height: 500px;
+    max-height: 600px;
+    margin-top: 10px;
     padding-top: 10px;
 }
 
-.field {
-    margin-bottom: 10px;
+/* FIELD STYLING */
+.details p {
+    margin: 6px 0;
 }
 
-.label {
-    font-weight: bold;
-    color: var(--accent);
-    text-transform: capitalize;
+.details strong {
+    color: var(--accent-color);
+}
+
+/* =========================
+   IMPORTANT FIX: INPUT THEMING
+========================= */
+
+input,
+select,
+button {
+    outline: none;
+}
+
+body.dark input,
+body.dark select,
+body.dark button,
+body.high-contrast input,
+body.high-contrast select,
+body.high-contrast button,
+body.pop-neon input,
+body.pop-neon select,
+body.pop-neon button {
+    background: var(--card-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
 }
