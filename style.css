@@ -1,66 +1,35 @@
-/* --- 1. Theme Configuration (The "Engine") --- */
+/* --- Base Theme Variables --- */
 :root {
-    --bg-color: #f4f4f9;
-    --text-color: #333;
-    --card-bg: #fff;
-    --border-color: #ddd;
-    --accent-color: #0066cc;
+    --bg-color: #f4f4f9; --text-color: #333; --card-bg: #fff;
+    --border-color: #ddd; --accent-color: #0066cc;
 }
 
+/* Dark Mode */
 body.dark-mode {
-    --bg-color: #1a1a1a;
-    --text-color: #e0e0e0;
-    --card-bg: #2d2d2d;
-    --border-color: #444;
-    --accent-color: #66b3ff;
+    --bg-color: #1a1a1a; --text-color: #e0e0e0; --card-bg: #2d2d2d;
+    --border-color: #444; --accent-color: #66b3ff;
 }
 
-/* --- 2. Base Page Layout --- */
-body { 
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
-    max-width: 800px; 
-    margin: 40px auto; 
-    padding: 0 20px; 
-    color: var(--text-color); 
-    background-color: var(--bg-color); 
-    line-height: 1.4; 
-    transition: background-color 0.3s, color 0.3s;
+/* High Contrast */
+body.high-contrast {
+    --bg-color: #000; --text-color: #fff; --card-bg: #000;
+    --border-color: #fff; --accent-color: #ffff00;
 }
 
-header { border-bottom: 2px solid var(--text-color); padding-bottom: 10px; margin-bottom: 20px; }
-h1 { margin: 0; font-size: 1.8em; }
+/* Pop Neon */
+body.pop-neon {
+    --bg-color: #0a0a0a; --text-color: #ff00ff; --card-bg: #1a1a1a;
+    --border-color: #00ffff; --accent-color: #00ffff;
+}
 
-/* --- 3. Search and UI Elements --- */
+/* --- Base Layout --- */
+body { font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; color: var(--text-color); background-color: var(--bg-color); transition: 0.3s; }
 .search-container { display: flex; gap: 10px; margin-bottom: 20px; }
-
-#searchMode, #themeSelector, #searchBar { 
-    padding: 10px; 
-    border: 2px solid var(--border-color); 
-    background-color: var(--card-bg);
-    color: var(--text-color);
-    border-radius: 4px;
-    box-sizing: border-box; 
-}
-
+#searchMode, #themeSelector, #searchBar { padding: 10px; border: 2px solid var(--border-color); background: var(--card-bg); color: var(--text-color); border-radius: 4px; }
 #searchBar { flex-grow: 1; }
-#searchMode:hover, #themeSelector:hover { border-color: var(--accent-color); cursor: pointer; }
 
-/* --- 4. Dictionary Grid (Masonry Effect) --- */
+/* Grid */
 #results { column-width: 280px; column-gap: 15px; }
-
-.entry { 
-    display: inline-block; 
-    width: 100%; 
-    margin-bottom: 15px; 
-    break-inside: avoid; 
-    border: 1px solid var(--border-color); 
-    background: var(--card-bg); 
-    border-radius: 4px; 
-}
-
-summary { padding: 15px; cursor: pointer; list-style: none; font-weight: bold; }
-summary::-webkit-details-marker { display: none; }
-
-.word { font-size: 1.2em; color: var(--accent-color); }
-.pos { color: var(--text-color); opacity: 0.7; font-size: 0.8em; margin-left: 5px; }
-.details-content { padding: 15px; border-top: 1px solid var(--border-color); background: var(--bg-color); font-size: 0.9em; }
+.entry { display: inline-block; width: 100%; margin-bottom: 15px; break-inside: avoid; border: 2px solid var(--border-color); background: var(--card-bg); border-radius: 4px; }
+summary { padding: 15px; cursor: pointer; font-weight: bold; color: var(--accent-color); }
+.details-content { padding: 15px; border-top: 2px solid var(--border-color); font-size: 0.9em; }
