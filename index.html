@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jajohua Dictionary</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; background-color: #f4f4f9; }
+        h1 { color: #333; }
+        #searchBar { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .entry { background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 4px; }
+        .word { font-weight: bold; font-size: 1.3em; color: #0066cc; }
+    </style>
+</head>
+<body>
+
+    <h1>Jajohua Dictionary</h1>
+    <input type="text" id="searchBar" placeholder="Search for a word..." onkeyup="search()">
+    <div id="dictionary-container">Loading dictionary...</div>
+
+    <script>
+        let dictionary = [];
+
+        // Correctly pointing to words.json
+        fetch('words.json')
+            .then(response => {
+                if (!response.ok) throw new Error("Could not find words.json");
+                return response.json();
+            })
+            .then(data => {
+                dictionary = data;
+                render(dictionary);
+            })
+            .catch(err => {
+                document.getElementById('dictionary-container').innerHTML = "Error loading words.json. Make sure the file is in the same folder as index.html.";
+                console.error(err);
+            });
+
+        function render(data) {
+            const container = document.getElementById('dictionary-container');
+            if (data.length === 0) {
+                container.innerHTML = "No words found.";
+                return;
+            }
+            container.innerHTML = data.map(item => `
+                <div class="entry">
+                    <div class="word">${item.word}</div>
+                    <div><strong>Translation:</strong> ${item.translation}</div>
+                </div>
+            `).join('');
+        }
+
+        function search() {
+            const query = document.getElementById('searchBar').value.toLowerCase();
+            const filtered = dictionary.filter(item => 
+                item.word.toLowerCase().includes(query) || 
+                item.translation.toLowerCase().includes(query)
+            );
+            render(filtered);
+        }
+    </script>
+</body>
+</html>
