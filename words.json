@@ -53,5 +53,83 @@
     "rootWord": "",
     "masteryLevel": 0,
     "lessonId": "1"
-  } 
+  },
+  {
+    "word": "fi",
+    "translation": "them (sing)",
+    "partOfSpeech": "",
+    "ipaPronunciation": "",
+    "simplePronunciation": "",
+    "exampleSentence": "",
+    "exampleEnglish": "",
+    "syllableBreakdown": "",
+    "rootWord": "",
+    "masteryLevel": 0,
+    "lessonId": "1"
+  },
+  {
+    "word": "wa",
+    "translation": "us",
+    "partOfSpeech": "partical",
+    "ipaPronunciation": "",
+    "simplePronunciation": "wa",
+    "exampleSentence": "",
+    "exampleEnglish": "",
+    "syllableBreakdown": "",
+    "rootWord": "",
+    "masteryLevel": 0,
+    "lessonId": "1"
+  },
+  {
+    "word": "na",
+    "translation": "ya'll",
+    "partOfSpeech": "partacal",
+    "ipaPronunciation": "",
+    "simplePronunciation": "na",
+    "exampleSentence": "",
+    "exampleEnglish": "",
+    "syllableBreakdown": "",
+    "rootWord": "",
+    "masteryLevel": 0,
+    "lessonId": "1"
+  },
+  {
+    "word": "fa",
+    "translation": "them (Plural)",
+    "partOfSpeech": "",
+    "ipaPronunciation": "",
+    "simplePronunciation": "",
+    "exampleSentence": "",
+    "exampleEnglish": "",
+    "syllableBreakdown": "",
+    "rootWord": "",
+    "masteryLevel": 0,
+    "lessonId": "1"
+  },
+  {
+    "word": "tso",
+    "translation": "food",
+    "partOfSpeech": "noun",
+    "ipaPronunciation": "",
+    "simplePronunciation": "tSo",
+    "exampleSentence": "tso hao",
+    "exampleEnglish": "good food",
+    "syllableBreakdown": "",
+    "rootWord": "",
+    "masteryLevel": 0,
+    "lessonId": "1"
+  },
+  {
+    "word": "zhozhi",
+    "translation": "give",
+    "partOfSpeech": "verb",
+    "ipaPronunciation": "",
+    "simplePronunciation": "",
+    "exampleSentence": "",
+    "exampleEnglish": "",
+    "syllableBreakdown": "",
+    "rootWord": "",
+    "masteryLevel": 0,
+    "lessonId": "1"
+  }
 ]
