@@ -42,7 +42,7 @@
         // 2. Filter out keys we don't want (word, translation, partOfSpeech, and lessonId)
         // 3. Create the HTML for the remaining fields automatically
         const extraFields = Object.keys(item)
-            .filter(key => !['word', 'translation', 'partOfSpeech', 'lessonId'].includes(key))
+            .filter(key => !['word', 'masteryLevel' 'lessonId'].includes(key))
             .map(key => `<p><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${item[key]}</p>`)
             .join('');
 
