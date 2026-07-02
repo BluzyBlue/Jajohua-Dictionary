@@ -1,4 +1,4 @@
-/* --- Global Variables (Easy to change for Dark Mode) --- */
+/* --- 1. Theme Configuration (The "Engine") --- */
 :root {
     --bg-color: #f4f4f9;
     --text-color: #333;
@@ -7,26 +7,6 @@
     --accent-color: #0066cc;
 }
 
-/* --- Base Styles --- */
-body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; color: var(--text-color); background-color: var(--bg-color); line-height: 1.4; }
-header { border-bottom: 2px solid var(--text-color); padding-bottom: 10px; margin-bottom: 20px; }
-h1 { margin: 0; font-size: 1.8em; }
-
-.search-container { display: flex; gap: 10px; margin-bottom: 20px; }
-#searchMode, #searchBar { padding: 10px; border: 2px solid var(--text-color); box-sizing: border-box; }
-#searchBar { flex-grow: 1; }
-
-#results { column-width: 280px; column-gap: 15px; }
-.entry { display: inline-block; width: 100%; margin-bottom: 15px; break-inside: avoid; border: 1px solid var(--border-color); background: var(--card-bg); border-radius: 4px; }
-
-summary { padding: 15px; cursor: pointer; list-style: none; font-weight: bold; }
-summary::-webkit-details-marker { display: none; }
-
-.word { font-size: 1.2em; color: var(--accent-color); }
-.pos { color: #777; font-size: 0.8em; margin-left: 5px; }
-.details-content { padding: 15px; border-top: 1px solid var(--border-color); background: #fafafa; font-size: 0.9em; }
-
-/* --- Dark Mode Overrides --- */
 body.dark-mode {
     --bg-color: #1a1a1a;
     --text-color: #e0e0e0;
@@ -35,7 +15,52 @@ body.dark-mode {
     --accent-color: #66b3ff;
 }
 
-/* Ensure the details content adjusts in dark mode */
-body.dark-mode .details-content {
-    background: #383838;
+/* --- 2. Base Page Layout --- */
+body { 
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+    max-width: 800px; 
+    margin: 40px auto; 
+    padding: 0 20px; 
+    color: var(--text-color); 
+    background-color: var(--bg-color); 
+    line-height: 1.4; 
+    transition: background-color 0.3s, color 0.3s;
 }
+
+header { border-bottom: 2px solid var(--text-color); padding-bottom: 10px; margin-bottom: 20px; }
+h1 { margin: 0; font-size: 1.8em; }
+
+/* --- 3. Search and UI Elements --- */
+.search-container { display: flex; gap: 10px; margin-bottom: 20px; }
+
+#searchMode, #themeSelector, #searchBar { 
+    padding: 10px; 
+    border: 2px solid var(--border-color); 
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-radius: 4px;
+    box-sizing: border-box; 
+}
+
+#searchBar { flex-grow: 1; }
+#searchMode:hover, #themeSelector:hover { border-color: var(--accent-color); cursor: pointer; }
+
+/* --- 4. Dictionary Grid (Masonry Effect) --- */
+#results { column-width: 280px; column-gap: 15px; }
+
+.entry { 
+    display: inline-block; 
+    width: 100%; 
+    margin-bottom: 15px; 
+    break-inside: avoid; 
+    border: 1px solid var(--border-color); 
+    background: var(--card-bg); 
+    border-radius: 4px; 
+}
+
+summary { padding: 15px; cursor: pointer; list-style: none; font-weight: bold; }
+summary::-webkit-details-marker { display: none; }
+
+.word { font-size: 1.2em; color: var(--accent-color); }
+.pos { color: var(--text-color); opacity: 0.7; font-size: 0.8em; margin-left: 5px; }
+.details-content { padding: 15px; border-top: 1px solid var(--border-color); background: var(--bg-color); font-size: 0.9em; }
