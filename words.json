@@ -1,0 +1,44 @@
+[
+  {
+    "word": "fawoza",
+    "translation": "hey",
+    "partOfSpeech": "yes",
+    "ipaPronunciation": "fawoza",
+    "simplePronunciation": "fa wo za",
+    "exampleSentence": "fawoza jomei",
+    "exampleEnglish": "hey echo",
+    "syllableBreakdown": "fa wo za",
+    "rootWord": "talofa",
+    "masteryLevel": 1,
+    "lessonId": "lesson 1",
+    "borrowedFrom": "samoen"
+  },
+  {
+    "word": "wo",
+    "translation": "I/me",
+    "partOfSpeech": "noun",
+    "ipaPronunciation": "Wo",
+    "simplePronunciation": "wo",
+    "exampleSentence": "wo etsoja",
+    "exampleEnglish": "I consume/eat/drink",
+    "syllableBreakdown": "wo",
+    "rootWord": "",
+    "masteryLevel": 0,
+    "lessonId": "1",
+    "borrowedFrom": "Chinese"
+  },
+  {
+    "word": "Ni",
+    "translation": "you",
+    "partOfSpeech": "pronoun",
+    "ipaPronunciation": "Ni",
+    "simplePronunciation": "Ni",
+    "exampleSentence": "",
+    "exampleEnglish": "",
+    "syllableBreakdown": "",
+    "rootWord": "ni",
+    "masteryLevel": 0,
+    "lessonId": "1",
+    "borrowedFrom": "Chinese"
+  }
+]
