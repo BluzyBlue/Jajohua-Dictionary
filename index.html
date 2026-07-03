@@ -45,7 +45,12 @@ let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
 fetch('words.json')
     .then(res => res.json())
     .then(data => {
-        dictionary = data;
+        // Sort alphabetically by the 'word' property
+        dictionary = data.sort((a, b) => {
+            const wordA = (a.word || "").toLowerCase();
+            const wordB = (b.word || "").toLowerCase();
+            return wordA.localeCompare(wordB);
+        });
         render(dictionary);
     })
     .catch(err => console.error("Error loading JSON:", err));
