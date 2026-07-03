@@ -21,6 +21,7 @@
 
     <input type="text" id="searchBar" placeholder="Search..." onkeyup="searchDict()" autofocus>
 
+    <button onclick="toggleFavFilter()" id="favFilterBtn">Show All</button>
     <button onclick="toggleFuzzy()" id="fuzzyBtn">Fuzzy Off</button>
     <button onclick="randomWord()">Random</button>
 
@@ -37,6 +38,7 @@
 <script>
 let dictionary = [];
 let fuzzy = false;
+let showOnlyFavorites = false; // Track the state of our new filter
 let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
 
 // Initial data load
@@ -58,7 +60,6 @@ function render(data) {
     }
 
     container.innerHTML = data.map(item => {
-        // Filter out empty strings, null values, and structure keys
         const fields = Object.keys(item)
             .filter(k => !['word','translation','partOfSpeech','lessonId','masteryLevel'].includes(k))
             .filter(k => item[k] && item[k].toString().trim() !== "")
@@ -100,12 +101,15 @@ function searchDict() {
     const query = document.getElementById('searchBar').value.toLowerCase().trim();
     const mode = document.getElementById('searchMode').value;
 
-    if (query === "") {
-        render(dictionary);
-        return;
-    }
-
     const filtered = dictionary.filter(i => {
+        // If "Show Stars" is on, immediately filter out non-favorites
+        if (showOnlyFavorites && !favorites.includes(i.word)) {
+            return false;
+        }
+
+        // If there's no text query, keep the item if it passed the favorites check
+        if (query === "") return true;
+
         const word = (i.word || "").toLowerCase();
         const trans = (i.translation || "").toLowerCase();
 
@@ -118,7 +122,6 @@ function searchDict() {
             match = word.includes(query) || trans.includes(query);
         }
 
-        // Fuzzy fallback option
         if (!match && fuzzy && query.length > 1) {
             return levenshtein(word, query) <= 2;
         }
@@ -127,6 +130,22 @@ function searchDict() {
     });
 
     render(filtered);
+}
+
+/* ---------------- FAVORITES BUTTON TOGGLE ---------------- */
+function toggleFavFilter() {
+    showOnlyFavorites = !showOnlyFavorites;
+    const btn = document.getElementById("favFilterBtn");
+    
+    if (showOnlyFavorites) {
+        btn.innerText = "★ Stars Only";
+        btn.style.borderColor = "var(--accent-color)"; // Highlight button when active
+    } else {
+        btn.innerText = "Show All";
+        btn.style.borderColor = ""; 
+    }
+    
+    searchDict(); // Recalculate results based on the filter change
 }
 
 /* ---------------- FUZZY SEARCH TOGGLE ---------------- */
@@ -138,8 +157,13 @@ function toggleFuzzy() {
 
 /* ---------------- RANDOM PICKER ---------------- */
 function randomWord() {
-    if (dictionary.length === 0) return;
-    const item = dictionary[Math.floor(Math.random() * dictionary.length)];
+    // Pick from current filtered set if available, otherwise entire dictionary
+    const dynamicPool = showOnlyFavorites 
+        ? dictionary.filter(i => favorites.includes(i.word)) 
+        : dictionary;
+
+    if (dynamicPool.length === 0) return;
+    const item = dynamicPool[Math.floor(Math.random() * dynamicPool.length)];
     document.getElementById('searchBar').value = item.word;
     searchDict();
 }
@@ -153,14 +177,12 @@ function toggleFav(word) {
     }
     localStorage.setItem("favorites", JSON.stringify(favorites));
     
-    // Rerun search to keep matching state active while updating stars
     searchDict();
 }
 
 /* ---------------- LEVENSHTEIN LOGIC ---------------- */
 function levenshtein(a, b) {
     const matrix = Array.from({ length: b.length + 1 }, () => Array(a.length + 1).fill(0));
-
     for (let i = 0; i <= a.length; i++) matrix[0][i] = i;
     for (let j = 0; j <= b.length; j++) matrix[j][0] = j;
 
@@ -182,18 +204,15 @@ function levenshtein(a, b) {
 function changeTheme() {
     const theme = document.getElementById("themeSelector").value;
     document.body.classList.remove("dark", "high-contrast", "pop-neon");
-
     if (theme !== "light") {
         document.body.classList.add(theme);
     }
     localStorage.setItem("theme", theme);
 }
 
-// Keep chosen theme intact across page loads
 window.onload = () => {
     const saved = localStorage.getItem("theme") || "light";
     document.body.classList.remove("dark", "high-contrast", "pop-neon");
-
     if (saved !== "light") {
         document.body.classList.add(saved);
     }
