@@ -1,50 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jajohua Dictionary</title>
-
-<link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
-<header>
-    <h1>Jajohua Dictionary</h1>
-</header>
-
-<div class="search-container">
-
-    <select id="searchMode">
-        <option value="contains">Contains</option>
-        <option value="startsWith">Starts With</option>
-        <option value="endsWith">Ends With</option>
-    </select>
-
-    <input type="text"
-        id="searchBar"
-        placeholder="Search..."
-        onkeyup="searchDict()"
-        autofocus>
-
-    <button onclick="toggleFuzzy()" id="fuzzyBtn">Fuzzy Off</button>
-
-    <button onclick="randomWord()">Random</button>
-
-    <select id="themeSelector" onchange="changeTheme()">
-    <option value="light">Light Theme</option>
-    <option value="dark">Dark Theme</option>
-    <option value="high-contrast">High Contrast</option>
-    <option value="pop-neon">Pop Neon</option>
-</select>
-
-</div>
-
-<div id="results"></div>
-
 <script>
-
 let dictionary = [];
 let fuzzy = false;
 let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
@@ -57,100 +11,71 @@ fetch('words.json')
     });
 
 /* ---------------- RENDER ---------------- */
-
 function render(data) {
+    const container = document.getElementById('results');
+    container.innerHTML = data.map(item => {
+        const fields = Object.keys(item)
+            .filter(k => !['word','translation','partOfSpeech','lessonId','masteryLevel'].includes(k))
+            .filter(k => item[k])
+            .map(k => `<p><strong>${k}:</strong> ${item[k]}</p>`).join('');
 
-const container = document.getElementById('results');
+        const isFav = favorites.includes(item.word);
 
-container.innerHTML = data.map(item => {
-
-    const fields = Object.keys(item)
-        .filter(k => !['word','translation','partOfSpeech','lessonId','masteryLevel'].includes(k))
-        .filter(k => item[k])
-        .map(k => `
-            <p><strong>${k}:</strong> ${item[k]}</p>
-        `).join('');
-
-    const isFav = favorites.includes(item.word);
-
-    return `
-    <div class="entry" data-word="${item.word.toLowerCase()}">
-
-        <div class="card" onclick="toggleCard(this)">
-
-            <div class="card-top">
-
-                <div>
-                    <div class="word">${item.word}</div>
-                    <div class="pos">${item.partOfSpeech || ''}</div>
-                    <div class="translation">${item.translation || ''}</div>
+        return `
+        <div class="entry" data-word="${item.word.toLowerCase()}">
+            <div class="card" onclick="toggleCard(this)">
+                <div class="card-top">
+                    <div>
+                        <div class="word">${item.word}</div>
+                        <div class="pos">${item.partOfSpeech || ''}</div>
+                        <div class="translation">${item.translation || ''}</div>
+                    </div>
+                    <button class="star ${isFav ? 'active' : ''}"
+                        onclick="event.stopPropagation(); toggleFav('${item.word}')">
+                        ★
+                    </button>
                 </div>
-
-                <button class="star ${isFav ? 'active' : ''}"
-                    onclick="event.stopPropagation(); toggleFav('${item.word}')">
-                    ★
-                </button>
-
+                <div class="details">${fields}</div>
             </div>
-
-            <div class="details">
-                ${fields}
-            </div>
-
-        </div>
-
-    </div>
-    `;
-}).join('');
-
+        </div>`;
+    }).join('');
 }
 
 /* ---------------- CARD TOGGLE ---------------- */
-
 function toggleCard(el) {
     el.classList.toggle('open');
 }
 
 /* ---------------- SEARCH ---------------- */
-
 function searchDict() {
+    const query = document.getElementById('searchBar').value.toLowerCase();
+    const mode = document.getElementById('searchMode').value;
 
-const query = document.getElementById('searchBar').value.toLowerCase();
-const mode = document.getElementById('searchMode').value;
+    const filtered = dictionary.filter(i => {
+        const word = (i.word || "").toLowerCase();
+        const trans = (i.translation || "").toLowerCase();
+        let match = false;
 
-const filtered = dictionary.filter(i => {
+        if (mode === "startsWith") match = word.startsWith(query);
+        else if (mode === "endsWith") match = word.endsWith(query);
+        else match = word.includes(query) || trans.includes(query);
 
-    const word = (i.word || "").toLowerCase();
-    const trans = (i.translation || "").toLowerCase();
-
-    let match = false;
-
-    if (mode === "startsWith") match = word.startsWith(query);
-    else if (mode === "endsWith") match = word.endsWith(query);
-    else match = word.includes(query) || trans.includes(query);
-
-    if (!match && fuzzy && query.length > 1) {
-        return levenshtein(word, query) <= 2;
-    }
-
-    return match;
-});
-
-render(filtered);
-
+        if (!match && fuzzy && query.length > 1) {
+            return levenshtein(word, query) <= 2;
+        }
+        return match;
+    });
+    render(filtered);
 }
 
 /* ---------------- FUZZY TOGGLE ---------------- */
-
 function toggleFuzzy() {
     fuzzy = !fuzzy;
-    document.getElementById("fuzzyBtn").innerText =
-        "Fuzzy " + (fuzzy ? "On" : "Off");
+    document.getElementById("fuzzyBtn").innerText = "Fuzzy " + (fuzzy ? "On" : "Off");
     searchDict();
 }
 
 /* ---------------- RANDOM WORD ---------------- */
-
 function randomWord() {
     const item = dictionary[Math.floor(Math.random() * dictionary.length)];
     document.getElementById('searchBar').value = item.word;
@@ -158,76 +83,185 @@ function randomWord() {
 }
 
 /* ---------------- FAVORITES ---------------- */
-
 function toggleFav(word) {
-
-if (favorites.includes(word)) {
-    favorites = favorites.filter(w => w !== word);
-} else {
-    favorites.push(word);
-}
-
-localStorage.setItem("favorites", JSON.stringify(favorites));
-render(dictionary);
-
+    if (favorites.includes(word)) {
+        favorites = favorites.filter(w => w !== word);
+    } else {
+        favorites.push(word);
+    }
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    render(dictionary);
 }
 
 /* ---------------- FUZZY SEARCH ---------------- */
-
 function levenshtein(a, b) {
+    const matrix = Array.from({ length: b.length + 1 }, () => Array(a.length + 1).fill(0));
+    for (let i = 0; i <= a.length; i++) matrix[0][i] = i;
+    for (let j = 0; j <= b.length; j++) matrix[j][0] = j;
 
-const matrix = Array.from({ length: b.length + 1 }, () =>
-    Array(a.length + 1).fill(0)
-);
-
-for (let i = 0; i <= a.length; i++) matrix[0][i] = i;
-for (let j = 0; j <= b.length; j++) matrix[j][0] = j;
-
-for (let j = 1; j <= b.length; j++) {
-    for (let i = 1; i <= a.length; i++) {
-
-        matrix[j][i] =
-            b[j - 1] === a[i - 1]
+    for (let j = 1; j <= b.length; j++) {
+        for (let i = 1; i <= a.length; i++) {
+            matrix[j][i] = b[j - 1] === a[i - 1]
                 ? matrix[j - 1][i - 1]
                 : Math.min(
                     matrix[j - 1][i - 1] + 1,
                     matrix[j][i - 1] + 1,
                     matrix[j - 1][i] + 1
                 );
+        }
     }
+    return matrix[b.length][a.length];
 }
+
+/* ---------------- THEME FUNCTIONS (MOVED OUTSIDE) ---------------- */
 function changeTheme() {
     const theme = document.getElementById("themeSelector").value;
-
-    // remove old theme classes
     document.body.classList.remove("dark", "high-contrast", "pop-neon");
-
-    // apply new theme (except light)
     if (theme !== "light") {
         document.body.classList.add(theme);
     }
-
     localStorage.setItem("theme", theme);
 }
 
 window.onload = () => {
     const saved = localStorage.getItem("theme") || "light";
-
     document.body.classList.remove("dark", "high-contrast", "pop-neon");
-
     if (saved !== "light") {
         document.body.classList.add(saved);
     }
-
     document.getElementById("themeSelector").value = saved;
 };
-return matrix[b.length][a.length];
+</script><script>
+let dictionary = [];
+let fuzzy = false;
+let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
 
+fetch('words.json')
+    .then(res => res.json())
+    .then(data => {
+        dictionary = data;
+        render(dictionary);
+    });
+
+/* ---------------- RENDER ---------------- */
+function render(data) {
+    const container = document.getElementById('results');
+    container.innerHTML = data.map(item => {
+        const fields = Object.keys(item)
+            .filter(k => !['word','translation','partOfSpeech','lessonId','masteryLevel'].includes(k))
+            .filter(k => item[k])
+            .map(k => `<p><strong>${k}:</strong> ${item[k]}</p>`).join('');
+
+        const isFav = favorites.includes(item.word);
+
+        return `
+        <div class="entry" data-word="${item.word.toLowerCase()}">
+            <div class="card" onclick="toggleCard(this)">
+                <div class="card-top">
+                    <div>
+                        <div class="word">${item.word}</div>
+                        <div class="pos">${item.partOfSpeech || ''}</div>
+                        <div class="translation">${item.translation || ''}</div>
+                    </div>
+                    <button class="star ${isFav ? 'active' : ''}"
+                        onclick="event.stopPropagation(); toggleFav('${item.word}')">
+                        ★
+                    </button>
+                </div>
+                <div class="details">${fields}</div>
+            </div>
+        </div>`;
+    }).join('');
 }
 
+/* ---------------- CARD TOGGLE ---------------- */
+function toggleCard(el) {
+    el.classList.toggle('open');
+}
+
+/* ---------------- SEARCH ---------------- */
+function searchDict() {
+    const query = document.getElementById('searchBar').value.toLowerCase();
+    const mode = document.getElementById('searchMode').value;
+
+    const filtered = dictionary.filter(i => {
+        const word = (i.word || "").toLowerCase();
+        const trans = (i.translation || "").toLowerCase();
+        let match = false;
+
+        if (mode === "startsWith") match = word.startsWith(query);
+        else if (mode === "endsWith") match = word.endsWith(query);
+        else match = word.includes(query) || trans.includes(query);
+
+        if (!match && fuzzy && query.length > 1) {
+            return levenshtein(word, query) <= 2;
+        }
+        return match;
+    });
+    render(filtered);
+}
+
+/* ---------------- FUZZY TOGGLE ---------------- */
+function toggleFuzzy() {
+    fuzzy = !fuzzy;
+    document.getElementById("fuzzyBtn").innerText = "Fuzzy " + (fuzzy ? "On" : "Off");
+    searchDict();
+}
+
+/* ---------------- RANDOM WORD ---------------- */
+function randomWord() {
+    const item = dictionary[Math.floor(Math.random() * dictionary.length)];
+    document.getElementById('searchBar').value = item.word;
+    searchDict();
+}
+
+/* ---------------- FAVORITES ---------------- */
+function toggleFav(word) {
+    if (favorites.includes(word)) {
+        favorites = favorites.filter(w => w !== word);
+    } else {
+        favorites.push(word);
+    }
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    render(dictionary);
+}
+
+/* ---------------- FUZZY SEARCH ---------------- */
+function levenshtein(a, b) {
+    const matrix = Array.from({ length: b.length + 1 }, () => Array(a.length + 1).fill(0));
+    for (let i = 0; i <= a.length; i++) matrix[0][i] = i;
+    for (let j = 0; j <= b.length; j++) matrix[j][0] = j;
+
+    for (let j = 1; j <= b.length; j++) {
+        for (let i = 1; i <= a.length; i++) {
+            matrix[j][i] = b[j - 1] === a[i - 1]
+                ? matrix[j - 1][i - 1]
+                : Math.min(
+                    matrix[j - 1][i - 1] + 1,
+                    matrix[j][i - 1] + 1,
+                    matrix[j - 1][i] + 1
+                );
+        }
+    }
+    return matrix[b.length][a.length];
+}
+
+/* ---------------- THEME FUNCTIONS (MOVED OUTSIDE) ---------------- */
+function changeTheme() {
+    const theme = document.getElementById("themeSelector").value;
+    document.body.classList.remove("dark", "high-contrast", "pop-neon");
+    if (theme !== "light") {
+        document.body.classList.add(theme);
+    }
+    localStorage.setItem("theme", theme);
+}
+
+window.onload = () => {
+    const saved = localStorage.getItem("theme") || "light";
+    document.body.classList.remove("dark", "high-contrast", "pop-neon");
+    if (saved !== "light") {
+        document.body.classList.add(saved);
+    }
+    document.getElementById("themeSelector").value = saved;
+};
 </script>
-
-</body>
-</html>
-
-
